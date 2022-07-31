@@ -26,7 +26,7 @@ app.get("/", (req, res) => {
 
 const MONGODB_URL =
   "mongodb+srv://shreeparab:R19btV2ZWswVjJ2p@cluster0.vztmj.mongodb.net/tour_db?retryWrites=true&w=majority&ssl=true";
-const port = process.env.port || 5000;
+const port = process.env.PORT || 5000;
 //app.get("/", (req, res) => {
 //  res.send("Hello world");
 //});
