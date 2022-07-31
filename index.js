@@ -24,15 +24,15 @@ app.get("/", (req, res) => {
   res.send("Wecome to tour API");
 });
 
-//const MONGODB_URL =
-//  "mongodb+srv://shreeparab:R19btV2ZWswVjJ2p@cluster0.vztmj.mongodb.net/tour_db?retryWrites=true&w=majority&ssl=true";
+const MONGODB_URL =
+  "mongodb+srv://shreeparab:R19btV2ZWswVjJ2p@cluster0.vztmj.mongodb.net/tour_db?retryWrites=true&w=majority&ssl=true";
 const port = process.env.port || 5000;
 //app.get("/", (req, res) => {
 //  res.send("Hello world");
 //});
 
 mongoose
-  .connect(process.env.MONGODB_URL)
+  .connect(MONGODB_URL)
   .then(() => {
     app.listen(port, () => {
       console.log("Server Running on port: " + port);
