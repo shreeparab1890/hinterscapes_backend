@@ -1,6 +1,6 @@
 //import emailMsgs from "./email.msgs";
 
-const CLIENT_ORIGIN = "https://hinterlandgoa.netlify.app/";
+const CLIENT_ORIGIN = "https://hinterlandgoa.netlify.app";
 
 // This file is exporting an Object with a single key/value pair.
 // However, because this is not a part of the logic of the application

@@ -85,6 +85,36 @@ export const collectEmail = async (req, res) => {
   }
 };
 
+export const emailVerify = async (req, res) => {
+  const { email } = req.body;
+  console.log(email);
+  try {
+    const oldUser = await userModel.findOne({ email });
+    if (oldUser && !oldUser.email_verified) {
+      // this case is: oldUser is valid user in db but email is not verified
+      const user = await userModel.findOne({ email });
+      sendEmail(user.email, templates.confirm(user._id)).then(() => {
+        if (user.name && user.password) {
+          res.status(200).json({
+            user,
+            message: "Confirmation email resent, maybe check your spam?",
+            nameFlag: true,
+          });
+        } else {
+          res.status(200).json({
+            user,
+            message: "Confirmation email resent, maybe check your spam? ",
+            nameFlag: false,
+          });
+        }
+      });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong" });
+    console.log(error);
+  }
+};
+
 export const confirmEmail = async (req, res) => {
   const id = req.params.id;
   try {
@@ -96,7 +126,9 @@ export const confirmEmail = async (req, res) => {
       userModel
         .findByIdAndUpdate(id, { email_verified: true })
         .then(() =>
-          res.status(200).json({ message: "Your email is confirmed!" })
+          res
+            .status(200)
+            .json({ message: "Your email is confirmed!Please Login Again" })
         );
     }
   } catch (error) {
@@ -106,15 +138,73 @@ export const confirmEmail = async (req, res) => {
 };
 
 export const signup = async (req, res) => {
-  const { email, password, firstName, lastName } = req.body;
+  const {
+    email,
+    password,
+    firstName,
+    lastName,
+    mobineNo,
+    imageUrl,
+    country,
+    state,
+  } = req.body;
   try {
     const oldUser = await userModel.findOne({ email });
 
     if (oldUser) {
+      //console.log(mobineNo);
       const hashedPassword = await bcrypt.hash(password, 12);
       const result = await userModel.findByIdAndUpdate(oldUser._id, {
         password: hashedPassword,
         name: firstName + " " + lastName,
+        mobileNo: mobineNo,
+        imageUrl: imageUrl,
+        country: country,
+        state: state,
+      });
+
+      const token = jwt.sign({ email: result.email, id: result._id }, secret, {
+        expiresIn: "1hr",
+      });
+      console.log(result);
+      res.status(200).json({ result, token });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong" });
+    console.log(error);
+  }
+};
+
+export const updateuser = async (req, res) => {
+  const { id } = req.params;
+  const {
+    email,
+    password,
+    firstName,
+    lastName,
+    confirmPassword,
+    mobileNo,
+    imageUrl,
+    country,
+    state,
+    name,
+  } = req.body;
+  try {
+    console.log(email);
+    console.log(id);
+
+    const oldUser = await userModel.findOne({ email });
+    console.log(oldUser);
+    if (oldUser) {
+      //console.log(mobineNo);
+      const hashedPassword = await bcrypt.hash(confirmPassword, 12);
+      const result = await userModel.findByIdAndUpdate(oldUser._id, {
+        password: hashedPassword,
+        name: name,
+        mobileNo: mobileNo,
+        imageUrl: imageUrl,
+        country: country,
+        state: state,
       });
 
       const token = jwt.sign({ email: result.email, id: result._id }, secret, {
@@ -130,13 +220,20 @@ export const signup = async (req, res) => {
 };
 
 export const googleSignin = async (req, res) => {
-  const { email, name, token, googleId } = req.body;
+  const { email, name, token, googleId, imageUrl } = req.body;
 
   try {
     const oldUser = await userModel.findOne({ email });
 
     if (oldUser) {
-      const result = { _id: oldUser._id.toString(), email, name };
+      const result = {
+        _id: oldUser._id.toString(),
+        email,
+        name,
+        imageUrl,
+        googleId,
+        email_verified: oldUser.email_verified,
+      };
       return res.status(200).json({ result, token });
     } else {
       return res.status(404).json({ message: "User Not Found, Please Signup" });
@@ -155,7 +252,7 @@ export const googleSignin = async (req, res) => {
 };
 
 export const googleSignup = async (req, res) => {
-  const { email, name, token, googleId, email_verified } = req.body;
+  const { email, name, token, googleId, email_verified, imageUrl } = req.body;
 
   try {
     const oldUser = await userModel.findOne({ email });
@@ -169,10 +266,27 @@ export const googleSignup = async (req, res) => {
       name,
       googleId,
       email_verified,
+      imageUrl,
     });
     res.status(200).json({ result, token });
   } catch (error) {
     res.status(500).json({ message: "Something went wrong" });
     console.log(error);
+  }
+};
+
+export const getUser = async (req, res) => {
+  const { id } = req.params;
+  console.log(id);
+  try {
+    const result = await userModel.findById(id);
+
+    if (!result) {
+      return res.status(400).json({ message: "User Does not exists" });
+    }
+
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(404).json({ message: "Something went wrong" });
   }
 };
