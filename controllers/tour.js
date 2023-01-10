@@ -26,7 +26,11 @@ export const getTours = async (req, res) => {
     const limit = 6;
     const startIndex = (Number(page) - 1) * limit;
     const total = await TourModal.countDocuments({});
-    const tours = await TourModal.find().limit(limit).skip(startIndex);
+    const tours = await TourModal.find({
+      approved: true,
+    })
+      .limit(limit)
+      .skip(startIndex);
     res.json({
       data: tours,
       currentPage: Number(page),
@@ -35,6 +39,20 @@ export const getTours = async (req, res) => {
     });
   } catch (error) {
     res.status(404).json({ message: "Something went wrong" });
+  }
+};
+
+export const getAllTours = async (req, res) => {
+  try {
+    // const tours = await TourModal.find();
+    // res.status(200).json(tours);
+
+    const tours = await TourModal.find();
+    res.json({
+      data: tours,
+    });
+  } catch (error) {
+    res.json({ message: "Something went wrong" });
   }
 };
 
@@ -72,7 +90,7 @@ export const deleteTour = async (req, res) => {
 
 export const updateTour = async (req, res) => {
   const { id } = req.params;
-  const { title, description, creator, imageFile, tags } = req.body;
+  const { title, description, creator, location, imageFile, tags } = req.body;
   try {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(404).json({ message: `No tour exist with id: ${id}` });
@@ -84,10 +102,47 @@ export const updateTour = async (req, res) => {
       description,
       tags,
       imageFile,
+      location,
       _id: id,
     };
     await TourModal.findByIdAndUpdate(id, updatedTour, { new: true });
     res.json(updatedTour);
+  } catch (error) {
+    res.status(404).json({ message: "Something went wrong" });
+  }
+};
+
+export const approveTour = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(404).json({ message: `No tour exist with id: ${id}` });
+    }
+
+    const tour = await TourModal.findOne({ _id: id });
+
+    if (tour.approved) {
+      const updatedTour = {
+        approved: false,
+      };
+      const appTour = await TourModal.findByIdAndUpdate(id, updatedTour, {
+        new: true,
+      });
+      const alltours = await TourModal.find();
+      res
+        .status(200)
+        .json({ tour: alltours, message: "Disaproved Succesfully" });
+    } else {
+      const updatedTour = {
+        approved: true,
+      };
+      const appTour = await TourModal.findByIdAndUpdate(id, updatedTour, {
+        new: true,
+      });
+      const alltours = await TourModal.find();
+      res.status(200).json({ tour: alltours, message: "Aproved Succesfully" });
+    }
   } catch (error) {
     res.status(404).json({ message: "Something went wrong" });
   }

@@ -6,6 +6,7 @@ import templates from "./email.templates.js";
 
 const secret = "test";
 
+//signin api with email and password in req body
 export const signin = async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -31,6 +32,7 @@ export const signin = async (req, res) => {
   }
 };
 
+//collect Email api (step 1) while registration with email in req body
 export const collectEmail = async (req, res) => {
   const { email } = req.body;
   try {
@@ -85,9 +87,9 @@ export const collectEmail = async (req, res) => {
   }
 };
 
+//email verify(collect email) api whith email in req body. with olduser email not varified case
 export const emailVerify = async (req, res) => {
   const { email } = req.body;
-  console.log(email);
   try {
     const oldUser = await userModel.findOne({ email });
     if (oldUser && !oldUser.email_verified) {
@@ -115,6 +117,7 @@ export const emailVerify = async (req, res) => {
   }
 };
 
+//confirm email api with id in req body
 export const confirmEmail = async (req, res) => {
   const id = req.params.id;
   try {
@@ -137,6 +140,7 @@ export const confirmEmail = async (req, res) => {
   }
 };
 
+//signup api (step 2)
 export const signup = async (req, res) => {
   const {
     email,
@@ -152,7 +156,6 @@ export const signup = async (req, res) => {
     const oldUser = await userModel.findOne({ email });
 
     if (oldUser) {
-      //console.log(mobineNo);
       const hashedPassword = await bcrypt.hash(password, 12);
       const result = await userModel.findByIdAndUpdate(oldUser._id, {
         password: hashedPassword,
@@ -175,6 +178,7 @@ export const signup = async (req, res) => {
   }
 };
 
+//update user api
 export const updateuser = async (req, res) => {
   const { id } = req.params;
   const {
@@ -196,7 +200,6 @@ export const updateuser = async (req, res) => {
     const oldUser = await userModel.findOne({ email });
     console.log(oldUser);
     if (oldUser) {
-      //console.log(mobineNo);
       const hashedPassword = await bcrypt.hash(confirmPassword, 12);
       const result = await userModel.findByIdAndUpdate(oldUser._id, {
         password: hashedPassword,
@@ -219,6 +222,7 @@ export const updateuser = async (req, res) => {
   }
 };
 
+//google signin api
 export const googleSignin = async (req, res) => {
   const { email, name, token, googleId, imageUrl } = req.body;
 
@@ -251,6 +255,7 @@ export const googleSignin = async (req, res) => {
   }
 };
 
+//google sign up api
 export const googleSignup = async (req, res) => {
   const { email, name, token, googleId, email_verified, imageUrl } = req.body;
 
@@ -275,6 +280,7 @@ export const googleSignup = async (req, res) => {
   }
 };
 
+// get user details based on id
 export const getUser = async (req, res) => {
   const { id } = req.params;
   console.log(id);

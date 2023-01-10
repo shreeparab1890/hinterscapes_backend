@@ -21,6 +21,7 @@ router.post("/googleSignup", googleSignup);
 router.post("/email", collectEmail);
 router.post("/email/verify", emailVerify);
 router.get("/email/confirm/:id", confirmEmail);
+
 router.get("/:id", auth, getUser);
 router.patch("/user/:id", auth, updateuser);
 

@@ -15,6 +15,11 @@ const tourSchema = mongoose.Schema({
     type: [String],
     default: [],
   },
+  location: String,
+  approved: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const TourModal = mongoose.model("tour", tourSchema);

@@ -11,6 +11,7 @@ const userSchema = mongoose.Schema({
   country: { type: String, required: false },
   state: { type: String, required: false },
   id: { type: String },
+  is_admin: { type: Boolean, required: true, default: false },
 });
 
 export default mongoose.model("User", userSchema);
