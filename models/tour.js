@@ -2,6 +2,9 @@ import mongoose from "mongoose";
 
 const tourSchema = mongoose.Schema({
   title: String,
+  where: String,
+  best_time: String,
+  how_to_reach: String,
   description: String,
   name: String,
   creator: String,
